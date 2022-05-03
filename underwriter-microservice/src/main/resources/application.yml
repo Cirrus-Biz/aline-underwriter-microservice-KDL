@@ -1,5 +1,5 @@
 server:
-  port: ${APP_PORT}
+  port: ${UNDERWRITER_PORT}
 
 spring:
   application:
@@ -9,10 +9,10 @@ spring:
       ddl-auto: update
     show-sql: true
   datasource:
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: "${MYSQLDB}"
+    password: "${MYSQLDB_PASSWORD}"
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: "jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}"
+    url: "jdbc:mysql://${DATABASE_NAME}:${DBPORT}/${DBNAME}"
     initialization-mode: always # This is to automatically insert data.sql
 
 app:
@@ -28,6 +28,6 @@ app:
   landing-portal: "${PORTAL_LANDING}"
   member-dashboard: "${PORTAL_DASHBOARD}"
   security:
-    secret-key: "${ENCRYPT_SECRET_KEY}"
+    secret-key: ${SECRET_KEY}
     jwt:
-      secret-key: "${JWT_SECRET_KEY}"
+      secret-key: ${JWT_SECRET_KEY}
