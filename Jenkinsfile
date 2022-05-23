@@ -19,7 +19,7 @@ pipeline {
             steps{
                 script{
                     withSonarQubeEnv(installationName: "sonarqube") {
-                        bat "mvn verify sonar:sonar"
+                        bat "mvn clean sonar:sonar"
                         }
 
                     // sleep(5)
@@ -61,7 +61,7 @@ pipeline {
   
         stage('Archive') {
             steps {
-            archiveArtifacts artifacts: 'transaction-underwriter/target/*.jar', followSymlinks: false
+            archiveArtifacts artifacts: 'underwriter-microservice/target/*.jar', followSymlinks: false
             }
         }
     }
