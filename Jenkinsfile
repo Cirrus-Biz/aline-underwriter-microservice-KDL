@@ -17,10 +17,18 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps{
+                script{
                     withSonarQubeEnv(installationName: "sonarqube") {
-                        bat "mvn sonar:sonar -Dsonar.projectKey=aline-underwriter-microservice"
+                        bat "mvn  sonar:sonar -Dsonar.projectKey=aline-underwriter-microservice"
                         }
+
+                    // sleep(5)
+                    // def qg = waitForQualityGate()
+                    // if (qg.status != "OK"){
+                    //     error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    // }
                 }
+
             }       
         }
 
@@ -57,3 +65,4 @@ pipeline {
             }
         }
     }
+}
