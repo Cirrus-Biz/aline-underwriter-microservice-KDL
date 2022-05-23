@@ -19,7 +19,7 @@ pipeline {
             steps{
                 script{
                     withSonarQubeEnv(installationName: "sonarqube") {
-                        bat "mvn sonar:sonar"
+                        bat "mvn verify sonar:sonar"
                         }
 
                     // sleep(5)
