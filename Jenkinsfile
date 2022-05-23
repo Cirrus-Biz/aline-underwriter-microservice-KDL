@@ -19,7 +19,7 @@ pipeline {
             steps{
                 script{
                     withSonarQubeEnv(installationName: "sonarqube") {
-                        bat "mvn clean sonar:sonar"
+                        bat "mvn sonar:sonar"
                         }
 
                     // sleep(5)
