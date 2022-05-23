@@ -14,14 +14,25 @@ pipeline {
                 bat "mvn -Dmaven.test.failure.ignore=true clean install"
             }
         }
+
         stage('SonarQube Analysis') {
             steps{
                 script{
                     withSonarQubeEnv(installationName: "sonarqube") {
                         bat "mvn sonar:sonar"
                         }
+
+                    // sleep(5)
+                    // def qg = waitForQualityGate()
+                    // if (qg.status != "OK"){
+                    //     error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    // }
                 }
-       
+
+            }       
+        }
+
+
         stage("Build Docker"){
             steps{
                 bat "docker build -t laxwalrus/capstone-underwriter:$BUILD_NUMBER ."
@@ -42,8 +53,6 @@ pipeline {
             }
         }
             
-
-
         stage("Cleaning"){
             steps{
                 bat "docker logout"
@@ -52,8 +61,8 @@ pipeline {
   
         stage('Archive') {
             steps {
-            archiveArtifacts artifacts: 'underwriter-microservice/target/*.jar', followSymlinks: false
+            archiveArtifacts artifacts: 'transaction-underwriter/target/*.jar', followSymlinks: false
             }
         }
-    }}
-}}
+    }
+}
