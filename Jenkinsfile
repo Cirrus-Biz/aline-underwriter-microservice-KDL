@@ -19,7 +19,7 @@ pipeline {
             steps{
                 script{
                     withSonarQubeEnv(installationName: "sonarqube") {
-                        bat "mvn sonar:sonar -Dsonar.projectKey=aline-underwriter-microservice"
+                        bat "mvn sonar:sonar"
                         }
                 }
 
