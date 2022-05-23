@@ -11,11 +11,17 @@ pipeline {
     stages {
         stage("Build MVN") {
             steps {
-                bat "mvn -Dmaven.test.failure.ignore=true clean package"
+                bat "mvn -Dmaven.test.failure.ignore=true clean install"
             }
         }
-
-
+        stage('SonarQube Analysis') {
+            steps{
+                script{
+                    withSonarQubeEnv(installationName: "sonarqube") {
+                        bat "mvn sonar:sonar"
+                        }
+                }
+       
         stage("Build Docker"){
             steps{
                 bat "docker build -t laxwalrus/capstone-underwriter:$BUILD_NUMBER ."
@@ -49,5 +55,5 @@ pipeline {
             archiveArtifacts artifacts: 'underwriter-microservice/target/*.jar', followSymlinks: false
             }
         }
-    }
-}
+    }}
+}}
