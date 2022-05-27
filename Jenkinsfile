@@ -1,7 +1,4 @@
 pipeline {
-    environment {
-        DOCKERHUB_CREDENTIALS=credentials("Dockerhub")
-    }
     agent any
 
     tools {
@@ -9,54 +6,58 @@ pipeline {
     }
 
     stages {
-        stage("Build MVN") {
-            steps {
-                bat "mvn -Dmaven.test.failure.ignore=true clean install"
-            }
-        }
-
         stage('SonarQube Analysis') {
             steps{
                 script{
                     withSonarQubeEnv(installationName: "sonarqube") {
-                        bat "mvn sonar:sonar"
+                        bat "mvn clean test sonar:sonar -Dsonar.projectKey=underwriter-microservice-kdl"
                         }
                 }
 
             }       
         }
 
-
-        stage("Build Docker"){
+        stage('Quality Gate Check'){
             steps{
-                bat "docker build -t laxwalrus/capstone-underwriter:$BUILD_NUMBER ."
+                script{
+                    sleep(5)
+                        def qg = waitForQualityGate()
+                        if(qg.status != 'OK'){
+                            error "Pipeline aborted due to quality gate failure"
+                    }
+                    }
+                }
+                
+            }
+        
+        stage("Build w/MVN") {
+            steps {
+                bat "mvn clean package -Dskiptests"
+            }
+        }
+
+        stage("Build Image w/docker"){
+            steps{
+                bat "docker build -t $env.AWS_ECR_REGISTRY/underwriter-microservice-kdl:$BUILD_NUMBER ."
 
             }            
         }
 
-
-        stage("login to docker"){
+        stage("Deploy to AWS"){
             steps{
-                bat "echo $DOCKERHUB_CREDENTIALS_PSW| docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
-            }
-        }
-
-        stage("Deploy Docker"){
-            steps{
-                bat "docker push laxwalrus/capstone-underwriter:$BUILD_NUMBER"
+                script{
+                   docker.withRegistry("https://$env.AWS_ECR_REGISTRY", "ecr:$env.AWS_REGION:AWS"){
+                       docker.image("$env.AWS_ECR_REGISTRY/underwriter-microservice-kdl:$BUILD_NUMBER").push()
+                   }
+                }
             }
         }
             
         stage("Cleaning"){
             steps{
-                bat "docker logout"
+                bat "docker system prune --all -f"
             }
         }
-  
-        stage('Archive') {
-            steps {
-            archiveArtifacts artifacts: 'underwriter-microservice/target/*.jar', followSymlinks: false
-            }
-        }
+        
     }
-}
+    }
