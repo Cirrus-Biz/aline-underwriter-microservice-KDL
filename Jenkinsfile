@@ -68,7 +68,7 @@ pipeline {
                 script{
                     COMMIT = "${GIT_COMMIT}"
                     SLICE = COMMIT[1..7]
-                   docker.withRegistry("https://$env.AWS_ECR_REGISTRY_WEST", "ecr:$env.AWS_REGION:AWS-KDL"){
+                   docker.withRegistry("https://$env.AWS_ECR_REGISTRY_WEST", "ecr:$env.AWS_REGION_WEST:AWS-KDL"){
                        docker.image("$env.AWS_ECR_REGISTRY_WEST/underwriter-microservice-kdl:${SLICE}.${BUILD_NUMBER}.${DATE}").push()
                        docker.image("$env.AWS_ECR_REGISTRY_WEST/underwriter-microservice-kdl:${SLICE}.${BUILD_NUMBER}.${DATE}").push("latest")
                    }
